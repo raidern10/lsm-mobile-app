@@ -1,5 +1,3 @@
-// app/_layout.tsx
-import 'react-native-reanimated';
 import React from 'react';
 import { Slot, useRouter, useSegments, type Href } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
@@ -19,7 +17,6 @@ import { colors } from '../src/theme';
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
-// Route dijadikan konstanta bertipe Href agar lolos typed-routes Router v6
 const LOGIN: Href = '/login';
 const HOME: Href = '/(app)/dashboard';
 
@@ -37,7 +34,7 @@ function AuthGate() {
 
   if (loading) {
     return (
-      <View style= fontFamily: fonts.semibold, color: colors.text >
+      <View style= flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bgSubtle >
         <ActivityIndicator color={colors.primary} size="large" />
       </View>
     );

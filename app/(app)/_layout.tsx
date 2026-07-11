@@ -29,6 +29,7 @@ export default function AppTabsLayout() {
       <Tabs.Screen name="dashboard" options={optDashboard} />
       <Tabs.Screen name="jurnal/index" options={optJurnal} />
       <Tabs.Screen name="jurnal/tambah" options={optHidden} />
+      <Tabs.Screen name="jurnal/[id]" options={optHidden} />
       <Tabs.Screen name="absensi/index" options={optAbsensi} />
       <Tabs.Screen name="absensi/tambah" options={optHidden} />
       <Tabs.Screen name="catatan/index" options={optCatatan} />
@@ -36,7 +37,8 @@ export default function AppTabsLayout() {
       <Tabs.Screen name="catatan/[id]" options={optHidden} />
       <Tabs.Screen name="observasi/index" options={optObservasi} />
       <Tabs.Screen name="observasi/[id]" options={optHidden} />
-      <Tabs.Screen name="nilai" options={optNilai} />
+      <Tabs.Screen name="nilai/index" options={optNilai} />
+      <Tabs.Screen name="nilai/[id]" options={optHidden} />
       <Tabs.Screen name="profil" options={optProfil} />
     </Tabs>
   );

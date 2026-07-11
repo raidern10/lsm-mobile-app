@@ -11,7 +11,13 @@ import {
 } from "react-native";
 import { getApiError } from "../../../src/api/client";
 import type { Catatan } from "../../../src/api/services";
-import { cetakApi, siswaApi } from "../../../src/api/services";
+import {
+  cetakApi,
+  guruApi,
+  instrukturApi,
+  siswaApi,
+} from "../../../src/api/services";
+import { useAuth } from "../../../src/auth/AuthContext";
 import { Badge } from "../../../src/components/Badge";
 import { Button } from "../../../src/components/Button";
 import { Card } from "../../../src/components/Card";
@@ -23,9 +29,19 @@ const TAMBAH = "/(app)/catatan/tambah" as Href;
 
 export default function CatatanList() {
   const router = useRouter();
+  const { user } = useAuth();
+  const role = user?.role;
+  const isSiswa = role === "siswa_pkl";
+  const isGuru = role === "guru_pembimbing";
+
   const { data, isLoading, refetch, isRefetching } = useQuery({
-    queryKey: ["catatan"],
-    queryFn: () => siswaApi.catatanList(),
+    queryKey: ["catatan", role],
+    queryFn: () =>
+      isGuru
+        ? guruApi.catatan()
+        : isSiswa
+          ? siswaApi.catatanList()
+          : instrukturApi.catatanList(),
   });
   const items: Catatan[] = data?.data ?? [];
 
@@ -39,7 +55,7 @@ export default function CatatanList() {
   };
 
   const buka = (c: Catatan) => {
-    if (c.is_approved) {
+    if (isSiswa && c.is_approved) {
       Alert.alert(
         "Terkunci",
         "Catatan yang sudah disetujui tidak bisa diubah.",
@@ -51,7 +67,9 @@ export default function CatatanList() {
 
   return (
     <Screen refreshing={isRefetching} onRefresh={refetch}>
-      <Button title="+ Tambah Catatan" onPress={() => router.push(TAMBAH)} />
+      {isSiswa ? (
+        <Button title="+ Tambah Catatan" onPress={() => router.push(TAMBAH)} />
+      ) : null}
       {isLoading ? (
         <Text style={styles.loading}>Memuat...</Text>
       ) : items.length === 0 ? (
@@ -64,6 +82,11 @@ export default function CatatanList() {
                 <Text style={styles.title}>{c.nama_pekerjaan}</Text>
                 <Badge status={c.is_approved ? "disetujui" : "pending"} />
               </View>
+              {!isSiswa ? (
+                <Text style={styles.siswa}>
+                  {c.siswa?.name ?? "-"} · {c.siswa?.nisn ?? "-"}
+                </Text>
+              ) : null}
               <Text style={styles.label}>Perencanaan</Text>
               <Text style={styles.body}>{c.perencanaan_kegiatan}</Text>
               <Text style={styles.label}>Pelaksanaan</Text>
@@ -78,7 +101,7 @@ export default function CatatanList() {
           </Pressable>
         ))
       )}
-      {items.length > 0 ? (
+      {isSiswa && items.length > 0 ? (
         <Button title="Cetak PDF Catatan" variant="outline" onPress={cetak} />
       ) : null}
     </Screen>
@@ -99,6 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
+  siswa: { fontFamily: fonts.medium, fontSize: 13, color: colors.primary },
   label: {
     fontFamily: fonts.medium,
     fontSize: 12,

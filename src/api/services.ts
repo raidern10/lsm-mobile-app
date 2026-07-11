@@ -112,3 +112,75 @@ export const cetakApi = {
   nilai: (siswaId?: number) =>
     api.get(`/cetak/nilai${siswaId ? `/${siswaId}` : ""}`).then((r) => r.data),
 };
+
+// ===== Tipe guru & instruktur =====
+export type JurnalUpdatePayload = {
+  status_persetujuan: "pending" | "disetujui" | "revisi";
+  catatan_instruktur?: string | null;
+};
+
+export type NilaiInstrukturPayload = {
+  user_id: number;
+  soft_skill: number;
+  hard_skill: number;
+  pengembangan_hard_skill: number;
+  kewirausahaan: number;
+  catatan_rekomendasi?: string | null;
+};
+
+export type NilaiGuruPayload = {
+  user_id: number;
+  nilai_guru: number;
+  nilai_laporan: number;
+  catatan_guru?: string | null;
+};
+
+// ===== API INSTRUKTUR =====
+export const instrukturApi = {
+  siswa: (page = 1) =>
+    api.get("/instruktur/siswa", { params: { page } }).then((r) => r.data),
+
+  // Approve / revisi jurnal
+  jurnalUpdate: (id: number, payload: JurnalUpdatePayload) =>
+    api.put(`/instruktur/jurnal/${id}/update`, payload).then((r) => r.data),
+
+  // Absensi (status HURUF KECIL: hadir/izin/sakit/alfa)
+  absensiList: (page = 1) =>
+    api.get("/instruktur/absensi", { params: { page } }).then((r) => r.data),
+  absensiCreate: (payload: {
+    siswa_id: number;
+    tanggal: string;
+    status: "hadir" | "izin" | "sakit" | "alfa";
+  }) => api.post("/instruktur/absensi", payload).then((r) => r.data),
+
+  // Catatan (butuh route GET /instruktur/catatan yang ditambahkan di langkah 0)
+  catatanList: (page = 1) =>
+    api.get("/instruktur/catatan", { params: { page } }).then((r) => r.data),
+  catatanApprove: (id: number, isApproved: boolean) =>
+    api.put(`/instruktur/catatan/${id}/approve`, { is_approved: isApproved }).then((r) => r.data),
+  catatanKomentar: (id: number, catatan: string) =>
+    api.put(`/instruktur/catatan/${id}/komentar`, { catatan_instruktur: catatan }).then((r) => r.data),
+
+  // Nilai
+  nilaiList: (page = 1, q?: string) =>
+    api.get("/instruktur/nilai", { params: { page, q } }).then((r) => r.data),
+  nilaiSimpan: (payload: NilaiInstrukturPayload) =>
+    api.post("/instruktur/nilai", payload).then((r) => r.data),
+};
+
+// ===== API GURU =====
+export const guruApi = {
+  dashboard: () => api.get("/guru/dashboard").then((r) => r.data),
+  siswa: (page = 1) =>
+    api.get("/guru/siswa", { params: { page } }).then((r) => r.data),
+  monitoringJurnal: (page = 1) =>
+    api.get("/guru/monitoring/jurnal", { params: { page } }).then((r) => r.data),
+  monitoringAbsensi: (page = 1) =>
+    api.get("/guru/monitoring/absensi", { params: { page } }).then((r) => r.data),
+  catatan: (page = 1) =>
+    api.get("/guru/catatan", { params: { page } }).then((r) => r.data),
+  nilaiList: (page = 1, q?: string) =>
+    api.get("/guru/nilai", { params: { page, q } }).then((r) => r.data),
+  nilaiSimpan: (payload: NilaiGuruPayload) =>
+    api.post("/guru/nilai", payload).then((r) => r.data),
+};

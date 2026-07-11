@@ -8,11 +8,11 @@ import {
     View,
 } from "react-native";
 
-// KEMBALI MENGGUNAKAN KURUNG KURAWAL { } UNTUK NAMED IMPORTS
-import { Button } from "../src/components/Button";
-import { Card } from "../src/components/Card";
-import { Screen } from "../src/components/Screen";
-import { TextField } from "../src/components/TextField";
+// IMPORT SESUAI DENGAN FORMAT EXPORT MASING-MASING KOMPONEN:
+import { Button } from "../src/components/Button"; // Menggunakan {} karena named export
+import { Card } from "../src/components/Card"; // Menggunakan {} karena named export
+import { Screen } from "../src/components/Screen"; // Menggunakan {} karena named export
+import TextField from "../src/components/TextField"; // TANPA {} karena export default
 
 import { getApiError } from "../src/api/client";
 import { useAuth } from "../src/auth/AuthContext";

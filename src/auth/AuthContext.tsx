@@ -64,10 +64,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await clearSession();
   };
 
+  const value: AuthState = { user, loading, signIn, signOut };
+
+  // PERBAIKAN: Menggunakan kurung kurawal ganda {{ }} untuk mengoper variabel objek 'value' ke dalam prop JSX
   return (
-    // PERBAIKAN: Membungkus value prop dengan kurung kurawal ganda {{ }}
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ ...value }}>{children}</AuthContext.Provider>
   );
 }

@@ -7,15 +7,12 @@ import {
     Text,
     View,
 } from "react-native";
-
-// IMPORT SESUAI DENGAN FORMAT EXPORT MASING-MASING KOMPONEN:
-import { Button } from "../src/components/Button"; // Menggunakan {} karena named export
-import { Card } from "../src/components/Card"; // Menggunakan {} karena named export
-import { Screen } from "../src/components/Screen"; // Menggunakan {} karena named export
-import TextField from "../src/components/TextField"; // TANPA {} karena export default
-
 import { getApiError } from "../src/api/client";
 import { useAuth } from "../src/auth/AuthContext";
+import { Button } from "../src/components/Button";
+import { Card } from "../src/components/Card";
+import { Screen } from "../src/components/Screen";
+import { TextField } from "../src/components/TextField";
 import { colors, fonts, spacing } from "../src/theme";
 
 export default function LoginScreen() {
@@ -29,7 +26,6 @@ export default function LoginScreen() {
       return Alert.alert("Lengkapi data", "Isi login dan password.");
     setLoading(true);
     try {
-      // Menggunakan 2 argumen sesuai dengan fungsi di AuthContext.tsx
       await signIn(login.trim(), password);
     } catch (e) {
       Alert.alert("Login gagal", getApiError(e));
@@ -40,18 +36,15 @@ export default function LoginScreen() {
 
   return (
     <Screen scroll={false}>
-      {/* Menggunakan kurung kurawal ganda {{ }} untuk style inline */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1, justifyContent: "center" }}
+        style={styles.flex}
       >
         <View style={styles.header}>
           <Text style={styles.brand}>Sistem PKL</Text>
           <Text style={styles.subtitle}>Monitoring Praktik Kerja Lapangan</Text>
         </View>
-
-        {/* Menggunakan kurung kurawal ganda {{ }} untuk style inline */}
-        <Card style={{ gap: spacing.md }}>
+        <Card style={styles.form}>
           <TextField
             label="NISN / NIP / Email"
             placeholder="Masukkan login kamu"
@@ -61,7 +54,7 @@ export default function LoginScreen() {
           />
           <TextField
             label="Password"
-            placeholder="••••••••"
+            placeholder="********"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
@@ -74,7 +67,9 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1, justifyContent: "center" },
   header: { alignItems: "center", marginBottom: spacing.xl },
   brand: { fontFamily: fonts.bold, fontSize: 28, color: colors.primary },
   subtitle: { fontFamily: fonts.regular, color: colors.muted, marginTop: 4 },
+  form: { gap: spacing.md },
 });

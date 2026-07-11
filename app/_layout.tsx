@@ -9,13 +9,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Slot, useRouter, useSegments, type Href } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import React from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-// PERBAIKAN 1: Menggunakan alias @/ agar tidak terjadi error "Cannot find module"
-import { AuthProvider, useAuth } from "@/src/auth/AuthContext";
-import { colors } from "@/src/theme";
+import { AuthProvider, useAuth } from "../src/auth/AuthContext";
+import { colors } from "../src/theme";
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -28,7 +27,7 @@ function AuthGate() {
   const segments = useSegments();
   const router = useRouter();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (loading) return;
     const inApp = segments[0] === "(app)";
     if (!user && inApp) router.replace(LOGIN);
@@ -37,15 +36,8 @@ function AuthGate() {
 
   if (loading) {
     return (
-      // PERBAIKAN 2: Menggunakan kurung kurawal ganda {{ }} untuk style
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: colors.bgSubtle,
-        }}
-      >
+      // PERBAIKAN: Memanggil objek gaya StyleSheet yang valid menggunakan kurung kurawal tunggal {}
+      <View style={styles.center}>
         <ActivityIndicator color={colors.primary} size="large" />
       </View>
     );
@@ -61,7 +53,7 @@ export default function RootLayout() {
     Figtree_700Bold,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
@@ -78,3 +70,13 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+// PERBAIKAN UTAMA: Objek style dideklarasikan secara valid di dalam StyleSheet.create
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.bgSubtle,
+  },
+});

@@ -1,73 +1,64 @@
-import { router } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter, type Href } from "expo-router";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { absensiApi } from "../../../src/api/services";
+import { useAuth } from "../../../src/auth/AuthContext";
+import { Badge } from "../../../src/components/Badge";
+import { Button } from "../../../src/components/Button";
+import { Card } from "../../../src/components/Card";
+import { EmptyState } from "../../../src/components/EmptyState";
+import { Screen } from "../../../src/components/Screen";
+import { colors, fonts } from "../../../src/theme";
 
-export default function AbsensiIndexScreen() {
+const TAMBAH: Href = "/(app)/absensi/tambah";
+
+export default function AbsensiList() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const { data, isLoading, refetch, isRefetching } = useQuery({
+    queryKey: ["absensis"],
+    queryFn: () => absensiApi.list(),
+  });
+  const items = data?.data ?? [];
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#f9fafb" }}>
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            color: "#1f2937",
-            marginBottom: 16,
-          }}
-        >
-          Data Absensi
-        </Text>
-
-        {/* Contoh Item Absensi */}
-        <View
-          style={{
-            backgroundColor: "#ffffff",
-            padding: 16,
-            borderRadius: 8,
-            borderLeftWidth: 4,
-            borderLeftColor: "#10b981",
-            marginBottom: 12,
-          }}
-        >
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-            Hadir - 12 Oktober 2026
-          </Text>
-          <Text style={{ color: "#6b7280", marginTop: 4 }}>
-            Keterangan: Tepat Waktu
-          </Text>
-        </View>
-      </ScrollView>
-
-      {/* Tombol Tambah (Floating Action Button) */}
-      <TouchableOpacity
-        onPress={() => router.push("/(app)/absensi/tambah")}
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-          backgroundColor: "#2563eb",
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          justifyContent: "center",
-          alignItems: "center",
-          elevation: 5,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.3,
-          shadowRadius: 3,
-        }}
-      >
-        <Text
-          style={{
-            color: "#ffffff",
-            fontSize: 28,
-            fontWeight: "300",
-            lineHeight: 32,
-          }}
-        >
-          +
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <Screen refreshing={isRefetching} onRefresh={refetch}>
+      {user?.role === "siswa_pkl" ? (
+        <Button
+          title="+ Isi Absensi Hari Ini"
+          onPress={() => router.push(TAMBAH)}
+        />
+      ) : null}
+      {isLoading ? (
+        <Text style={styles.loading}>Memuat...</Text>
+      ) : items.length === 0 ? (
+        <EmptyState text="Belum ada absensi." />
+      ) : (
+        items.map((a: any) => (
+          <Card key={a.id} style={styles.card}>
+            <View style={styles.row}>
+              <Text style={styles.date}>{a.tanggal}</Text>
+              <Badge status={a.status} />
+            </View>
+            <Text style={styles.jam}>
+              Masuk: {a.jam_masuk ?? "-"} · Pulang: {a.jam_pulang ?? "-"}
+            </Text>
+          </Card>
+        ))
+      )}
+    </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  card: { gap: 4 },
+  loading: { fontFamily: fonts.regular, color: colors.muted },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  date: { fontFamily: fonts.semibold, color: colors.text, fontSize: 15 },
+  jam: { fontFamily: fonts.regular, color: colors.muted, fontSize: 13 },
+});

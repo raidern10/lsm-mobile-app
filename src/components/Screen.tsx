@@ -3,6 +3,8 @@ import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing } from "../theme";
 
+const EDGES = ["top"] as const;
+
 export function Screen({
   children,
   scroll = true,
@@ -15,7 +17,7 @@ export function Screen({
   onRefresh?: () => void;
 }) {
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={styles.safe} edges={EDGES}>
       {scroll ? (
         <ScrollView
           contentContainerStyle={styles.content}
@@ -37,6 +39,7 @@ export function Screen({
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bgSubtle },
   content: { padding: spacing.lg, gap: spacing.md, flexGrow: 1 },

@@ -1,77 +1,80 @@
-import { router } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter, type Href } from "expo-router";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Linking, StyleSheet, Text, View } from "react-native";
+import { getApiError } from "../../../src/api/client";
+import { cetakApi, jurnalApi } from "../../../src/api/services";
+import { useAuth } from "../../../src/auth/AuthContext";
+import { Badge } from "../../../src/components/Badge";
+import { Button } from "../../../src/components/Button";
+import { Card } from "../../../src/components/Card";
+import { EmptyState } from "../../../src/components/EmptyState";
+import { Screen } from "../../../src/components/Screen";
+import { colors, fonts } from "../../../src/theme";
 
-export default function JurnalIndexScreen() {
+const TAMBAH: Href = "/(app)/jurnal/tambah";
+
+export default function JurnalList() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const { data, isLoading, refetch, isRefetching } = useQuery({
+    queryKey: ["jurnals"],
+    queryFn: () => jurnalApi.list(),
+  });
+  const items = data?.data ?? [];
+
+  const cetak = async () => {
+    try {
+      const res = await cetakApi.jurnal();
+      if (res?.url) await Linking.openURL(res.url);
+      else Alert.alert("Info", "URL cetak tidak tersedia.");
+    } catch (e) {
+      Alert.alert("Gagal mencetak", getApiError(e));
+    }
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#f9fafb" }}>
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            color: "#1f2937",
-            marginBottom: 16,
-          }}
-        >
-          Data Jurnal
-        </Text>
+    <Screen refreshing={isRefetching} onRefresh={refetch}>
+      {user?.role === "siswa_pkl" ? (
+        <Button title="+ Tambah Jurnal" onPress={() => router.push(TAMBAH)} />
+      ) : null}
+      <Button title="Cetak PDF Jurnal" variant="outline" onPress={cetak} />
 
-        {/* Contoh Item Jurnal */}
-        <View
-          style={{
-            backgroundColor: "#ffffff",
-            padding: 16,
-            borderRadius: 8,
-            borderLeftWidth: 4,
-            borderLeftColor: "#f59e0b",
-            marginBottom: 12,
-          }}
-        >
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-            Pembuatan UI Login
-          </Text>
-          <Text style={{ color: "#6b7280", marginTop: 4 }}>
-            Tanggal: 12 Oktober 2026
-          </Text>
-          <Text style={{ color: "#374151", marginTop: 8 }}>
-            Memperbaiki desain halaman login menggunakan React Native Expo
-            Router.
-          </Text>
-        </View>
-      </ScrollView>
-
-      {/* Tombol Tambah (Floating Action Button) */}
-      <TouchableOpacity
-        onPress={() => router.push("/(app)/jurnal/tambah")}
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-          backgroundColor: "#2563eb",
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          justifyContent: "center",
-          alignItems: "center",
-          elevation: 5,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.3,
-          shadowRadius: 3,
-        }}
-      >
-        <Text
-          style={{
-            color: "#ffffff",
-            fontSize: 28,
-            fontWeight: "300",
-            lineHeight: 32,
-          }}
-        >
-          +
-        </Text>
-      </TouchableOpacity>
-    </View>
+      {isLoading ? (
+        <Text style={styles.loading}>Memuat...</Text>
+      ) : items.length === 0 ? (
+        <EmptyState text="Belum ada jurnal." />
+      ) : (
+        items.map((j: any) => (
+          <Card key={j.id} style={styles.card}>
+            <View style={styles.row}>
+              <Text style={styles.date}>{j.hari_tanggal}</Text>
+              <Badge status={j.status_persetujuan} />
+            </View>
+            {j.siswa?.name ? (
+              <Text style={styles.siswa}>{j.siswa.name}</Text>
+            ) : null}
+            {(j.items ?? []).slice(0, 2).map((it: any, i: number) => (
+              <Text key={i} style={styles.item}>
+                • {it.unit_kerja}: {it.uraian}
+              </Text>
+            ))}
+          </Card>
+        ))
+      )}
+    </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  card: { gap: 4 },
+  loading: { fontFamily: fonts.regular, color: colors.muted },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  date: { fontFamily: fonts.semibold, color: colors.text, fontSize: 15 },
+  siswa: { fontFamily: fonts.medium, color: colors.primary, fontSize: 13 },
+  item: { fontFamily: fonts.regular, color: colors.muted, fontSize: 13 },
+});

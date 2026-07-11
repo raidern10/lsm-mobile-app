@@ -1,37 +1,56 @@
-import React from "react";
-import { Text, TextInput, TextInputProps, View } from "react-native";
+import React, { useState } from "react";
+import {
+    StyleSheet,
+    Text,
+    TextInput,
+    TextInputProps,
+    View,
+} from "react-native";
+import { colors, fonts, radius, spacing } from "../theme";
 
-interface TextFieldProps extends TextInputProps {
-  label: string;
-}
+type Props = TextInputProps & { label?: string };
 
-export default function TextField({ label, ...props }: TextFieldProps) {
+// PERBAIKAN: Menggunakan named export agar sinkron dengan file komponen lainnya
+export function TextField({ label, style, ...props }: Props) {
+  const [focused, setFocused] = useState(false);
+
   return (
-    <View style={{ marginBottom: 16 }}>
-      <Text
-        style={{
-          fontSize: 14,
-          fontWeight: "600",
-          marginBottom: 6,
-          color: "#374151",
-        }}
-      >
-        {label}
-      </Text>
+    // PERBAIKAN: Memanggil gaya objek menggunakan kurung kurawal tunggal {}
+    <View style={styles.wrap}>
+      {label ? <Text style={styles.label}>{label}</Text> : null}
       <TextInput
-        style={{
-          borderWidth: 1,
-          borderColor: "#d1d5db",
-          borderRadius: 8,
-          paddingHorizontal: 12,
-          paddingVertical: 10,
-          backgroundColor: "#ffffff",
-          fontSize: 16,
-          color: "#111827",
-        }}
-        placeholderTextColor="#9ca3af"
+        placeholderTextColor={colors.mutedLight}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={[styles.input, focused && styles.inputFocused, style]}
         {...props}
       />
     </View>
   );
 }
+
+// PERBAIKAN UTAMA: Objek style dideklarasikan secara valid di dalam StyleSheet.create
+const styles = StyleSheet.create({
+  wrap: {
+    gap: 6,
+  },
+  label: {
+    fontFamily: fonts.medium,
+    color: colors.text,
+    fontSize: 14,
+  },
+  input: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    height: 48,
+    fontFamily: fonts.regular,
+    color: colors.text,
+    fontSize: 15,
+  },
+  inputFocused: {
+    borderColor: colors.primary,
+  },
+});

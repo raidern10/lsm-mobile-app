@@ -1,28 +1,37 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
-import { colors, radius, fonts, spacing } from '../theme';
+import React from "react";
+import { Text, TextInput, TextInputProps, View } from "react-native";
 
-type Props = TextInputProps & { label?: string };
-export function TextField({ label, style, ...props }: Props) {
-  const [focused, setFocused] = useState(false);
+interface TextFieldProps extends TextInputProps {
+  label: string;
+}
+
+export default function TextField({ label, ...props }: TextFieldProps) {
   return (
-    <View style= gap: spacing.xs >
-      {label ? <Text style={styles.label}>{label}</Text> : null}
+    <View style={{ marginBottom: 16 }}>
+      <Text
+        style={{
+          fontSize: 14,
+          fontWeight: "600",
+          marginBottom: 6,
+          color: "#374151",
+        }}
+      >
+        {label}
+      </Text>
       <TextInput
-        placeholderTextColor={colors.mutedLight}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={[styles.input, focused && { borderColor: colors.primary }, style]}
+        style={{
+          borderWidth: 1,
+          borderColor: "#d1d5db",
+          borderRadius: 8,
+          paddingHorizontal: 12,
+          paddingVertical: 10,
+          backgroundColor: "#ffffff",
+          fontSize: 16,
+          color: "#111827",
+        }}
+        placeholderTextColor="#9ca3af"
         {...props}
       />
     </View>
   );
 }
-const styles = StyleSheet.create({
-  label: { fontFamily: fonts.medium, color: colors.text, fontSize: 14 },
-  input: {
-    backgroundColor: colors.white, borderWidth: 1, borderColor: colors.borderSoft,
-    borderRadius: radius.md, paddingHorizontal: spacing.md, height: 48,
-    fontFamily: fonts.regular, color: colors.text, fontSize: 15,
-  },
-});

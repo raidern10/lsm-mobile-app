@@ -1,66 +1,23 @@
-import React from 'react';
-import { Slot, useRouter, useSegments, type Href } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import * as SplashScreen from 'expo-splash-screen';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {
-  useFonts,
-  Figtree_400Regular, Figtree_500Medium,
-  Figtree_600SemiBold, Figtree_700Bold,
-} from '@expo-google-fonts/figtree';
-
-import { AuthProvider, useAuth } from '../src/auth/AuthContext';
-import { colors } from '../src/theme';
-
-const queryClient = new QueryClient();
-SplashScreen.preventAutoHideAsync();
-
-const LOGIN: Href = '/login';
-const HOME: Href = '/(app)/dashboard';
-
-function AuthGate() {
-  const { user, loading } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
-
-  React.useEffect(() => {
-    if (loading) return;
-    const inApp = segments[0] === '(app)';
-    if (!user && inApp) router.replace(LOGIN);
-    else if (user && !inApp) router.replace(HOME);
-  }, [user, loading, segments]);
-
-  if (loading) {
-    return (
-      <View style= flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bgSubtle >
-        <ActivityIndicator color={colors.primary} size="large" />
-      </View>
-    );
-  }
-  return <Slot />;
-}
+import { Slot } from "expo-router";
+import { View } from "react-native";
+import { AuthProvider } from "../src/auth/AuthContext";
+// Import colors/theme Anda jika ada
+// import { colors } from '../src/theme';
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Figtree_400Regular, Figtree_500Medium, Figtree_600SemiBold, Figtree_700Bold,
-  });
-
-  React.useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) return null;
-
   return (
-    <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <StatusBar style="dark" />
-          <AuthGate />
-        </AuthProvider>
-      </QueryClientProvider>
-    </SafeAreaProvider>
+    <AuthProvider>
+      {/* PERBAIKAN: Menggunakan kurung kurawal ganda {{ }} */}
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f4f4f5",
+        }}
+      >
+        <Slot />
+      </View>
+    </AuthProvider>
   );
 }

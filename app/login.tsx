@@ -1,45 +1,80 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { Screen } from '../src/components/Screen';
-import { Card } from '../src/components/Card';
-import { TextField } from '../src/components/TextField';
-import { Button } from '../src/components/Button';
-import { useAuth } from '../src/auth/AuthContext';
-import { getApiError } from '../src/api/client';
-import { colors, fonts, spacing } from '../src/theme';
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useAuth } from "../src/auth/AuthContext";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const onSubmit = async () => {
-    if (!login || !password) return Alert.alert('Lengkapi data', 'Isi login dan password.');
-    setLoading(true);
-    try { await signIn(login.trim(), password); }
-    catch (e) { Alert.alert('Login gagal', getApiError(e)); }
-    finally { setLoading(false); }
+  const handleLogin = async () => {
+    await signIn({ email, password });
+    router.replace("/(app)/dashboard");
   };
 
   return (
-    <Screen scroll={false}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style= flex: 1, justifyContent: 'center' >
-        <View style={styles.header}>
-          <Text style={styles.brand}>Sistem PKL</Text>
-          <Text style={styles.subtitle}>Monitoring Praktik Kerja Lapangan</Text>
-        </View>
-        <Card style= gap: spacing.md >
-          <TextField label="NISN / NIP / Email" placeholder="Masukkan login kamu" autoCapitalize="none" value={login} onChangeText={setLogin} />
-          <TextField label="Password" placeholder="••••••••" secureTextEntry value={password} onChangeText={setPassword} />
-          <Button title="Masuk" onPress={onSubmit} loading={loading} />
-        </Card>
-      </KeyboardAvoidingView>
-    </Screen>
+    // PERBAIKAN: Semua style menggunakan {{ ... }}
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        padding: 24,
+        backgroundColor: "#ffffff",
+      }}
+    >
+      <View style={{ gap: 16 }}>
+        <Text
+          style={{
+            fontSize: 28,
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: 20,
+          }}
+        >
+          Login LSM Mobile
+        </Text>
+
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          style={{
+            borderWidth: 1,
+            borderColor: "#e5e7eb",
+            padding: 14,
+            borderRadius: 8,
+          }}
+        />
+
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={{
+            borderWidth: 1,
+            borderColor: "#e5e7eb",
+            padding: 14,
+            borderRadius: 8,
+          }}
+        />
+
+        <TouchableOpacity
+          onPress={handleLogin}
+          style={{
+            backgroundColor: "#2563eb",
+            padding: 16,
+            borderRadius: 8,
+            alignItems: "center",
+            marginTop: 10,
+          }}
+        >
+          <Text style={{ color: "#ffffff", fontWeight: "bold", fontSize: 16 }}>
+            Masuk
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
-const styles = StyleSheet.create({
-  header: { alignItems: 'center', marginBottom: spacing.xl },
-  brand: { fontFamily: fonts.bold, fontSize: 28, color: colors.primary },
-  subtitle: { fontFamily: fonts.regular, color: colors.muted, marginTop: 4 },
-});

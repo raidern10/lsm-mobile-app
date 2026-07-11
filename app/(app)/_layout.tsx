@@ -1,5 +1,4 @@
 import { Tabs } from "expo-router";
-import React from "react";
 import { colors, fonts } from "../../src/theme";
 
 const screenOptions = {
@@ -18,18 +17,27 @@ const screenOptions = {
 const optDashboard = { title: "Dashboard" };
 const optJurnal = { title: "Jurnal" };
 const optAbsensi = { title: "Absensi" };
+const optCatatan = { title: "Catatan" };
+const optObservasi = { title: "Observasi" };
+const optNilai = { title: "Nilai" };
 const optProfil = { title: "Profil" };
 const optHidden = { href: null };
 
-export default function AppLayout() {
+export default function AppTabsLayout() {
   return (
     <Tabs screenOptions={screenOptions}>
       <Tabs.Screen name="dashboard" options={optDashboard} />
       <Tabs.Screen name="jurnal/index" options={optJurnal} />
-      <Tabs.Screen name="absensi/index" options={optAbsensi} />
-      <Tabs.Screen name="profil" options={optProfil} />
       <Tabs.Screen name="jurnal/tambah" options={optHidden} />
+      <Tabs.Screen name="absensi/index" options={optAbsensi} />
       <Tabs.Screen name="absensi/tambah" options={optHidden} />
+      <Tabs.Screen name="catatan/index" options={optCatatan} />
+      <Tabs.Screen name="catatan/tambah" options={optHidden} />
+      <Tabs.Screen name="catatan/[id]" options={optHidden} />
+      <Tabs.Screen name="observasi/index" options={optObservasi} />
+      <Tabs.Screen name="observasi/[id]" options={optHidden} />
+      <Tabs.Screen name="nilai" options={optNilai} />
+      <Tabs.Screen name="profil" options={optProfil} />
     </Tabs>
   );
 }
